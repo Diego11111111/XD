@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Conversación</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #111;
+            color: white;
+        }
+        .chat-container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: #222;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+            height: 500px;
+        }
+        .message {
+            margin: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            width: fit-content;
+            max-width: 70%;
+        }
+        .bot-message {
+            background-color: #f39c12;
+            align-self: flex-start;
+        }
+        .user-message {
+            background-color: #007bff;
+            text-align: right;
+            align-self: flex-end;
+        }
+        .options {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+        .option {
+            margin: 0 5px;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="message bot-message">¡Hola! Soy EAgle.</div>
+    </div>
+
+    <script>
+        const chatContainer = document.querySelector('.chat-container');
+        let step = 0;
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function addMessage(message, isUser, delay = 0) {
+            await sleep(delay);
+            const messageClass = isUser ? 'user-message' : 'bot-message';
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', messageClass);
+            messageElement.textContent = message;
+            chatContainer.appendChild(messageElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function addOptions(options, delay = 0) {
+            await sleep(delay);
+            const optionsHTML = options.map(option => `<button class="option">${option}</button>`).join(' ');
+            const optionsElement = document.createElement('div');
+            optionsElement.classList.add('options');
+            optionsElement.innerHTML = optionsHTML;
+            chatContainer.appendChild(optionsElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        chatContainer.addEventListener('click', async (event) => {
+            const clickedOption = event.target.textContent;
+
+            if (step === 0) {
+                step++;
+                await addMessage('¡Hola! Soy EAgle.', false, 1000);
+                await addOptions(['Hola']);
+            } else if (step === 1 && clickedOption === 'Hola') {
+                step++;
+                await addMessage(clickedOption, true);
+                await addMessage('¿Deseas corroborar si la información de alguna fuente es verídica?', false, 1000);
+                await addOptions(['Si por favor', 'No, gracias']);
+            } else if (step === 2 && clickedOption === 'Si por favor') {
+                step++;
+                await addMessage(clickedOption, true);
+                await addMessage('¿Entendido, puedes enviarme el link de la fuente?', false, 1000);
+                await addOptions(['https://www.ondacero.es/solo-ondaceroes/toma-pastilla-roja/podcast/1x15-vacunas-5g-control-mental_202007085f05ec42f5f4b20001a91e13.html'], 1500);
+            } else if (step === 3 && clickedOption.startsWith('https://')) {
+                step++;
+                await addMessage(clickedOption, true);
+                await addMessage('De acuerdo al análisis que hice, esta fuente es una Fake News, ya que no concuerda con la información y las características que poseen las páginas confiables.', false, 2000);
+            }
+        });
+    </script>
+</body>
+</html>
